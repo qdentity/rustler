@@ -19,9 +19,15 @@ pub mod resource;
 pub mod term;
 pub mod tuple;
 
-pub use rustler_sys::{
+pub use crate::rustler_sys::{
     enif_clear_env, enif_free_env, enif_get_local_pid, enif_make_pid, enif_map_iterator_create,
     enif_map_iterator_destroy, enif_map_iterator_get_pair, enif_map_iterator_next, enif_self,
+    enif_send, enif_thread_type, enif_alloc_env, enif_get_int64, enif_make_int64,
+    enif_get_uint64, enif_make_uint64, enif_get_double, enif_make_double,
+    enif_get_uint, enif_make_uint, enif_get_int, enif_make_int, enif_schedule_nif,
+    enif_inspect_binary, enif_make_sub_binary, enif_inspect_iolist_as_binary,
+    enif_make_binary, enif_release_binary, enif_is_identical, enif_compare,
+    enif_make_copy, enif_consume_timeslice, enif_release_resource,
     ErlNifMapIterator, ErlNifMapIteratorEntry, ErlNifPid, ERL_NIF_THR_DIRTY_CPU_SCHEDULER,
     ERL_NIF_THR_DIRTY_IO_SCHEDULER, ERL_NIF_THR_NORMAL_SCHEDULER, ERL_NIF_THR_UNDEFINED,
 };
@@ -29,9 +35,9 @@ pub use rustler_sys::{
 pub use std::os::raw::{c_double, c_int, c_uchar, c_uint, c_void};
 pub type size_t = usize;
 
-pub type NIF_ENV = *mut rustler_sys::ErlNifEnv;
+pub type NIF_ENV = *mut crate::rustler_sys::ErlNifEnv;
 pub type NIF_TERM = size_t;
-pub type NIF_RESOURCE_TYPE = *const rustler_sys::ErlNifResourceType;
+pub type NIF_RESOURCE_TYPE = *const crate::rustler_sys::ErlNifResourceType;
 
 pub fn get_nif_resource_type_init_size() -> usize {
     std::mem::size_of::<rustler_sys::ErlNifResourceTypeInit>()

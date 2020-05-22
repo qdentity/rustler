@@ -12,11 +12,13 @@ edition = "2018"
 default = ["derive"]
 derive = ["rustler_codegen"]
 alternative_nif_init_name = []
+mock = ["rustler_mock_rt"]
 
 [dependencies]
 lazy_static = "1.4"
 rustler_codegen = { path = "../rustler_codegen", version = "0.25.0", optional = true}
 rustler_sys = { path = "../rustler_sys", version = "~2.2" }
+rustler_mock_rt = { path = "../rustler_mock_rt", optional = true }
 
 [package.metadata.release]
 

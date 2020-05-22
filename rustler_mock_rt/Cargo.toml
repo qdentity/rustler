@@ -1,0 +1,33 @@
+[package]
+name = "rustler_mock_rt"
+version = "0.1.0"
+authors = ["Hans Elias B. Josephsen <me@hansihe.com>"]
+edition = "2018"
+
+[lib]
+name = "rustler_mock_rt"
+path = "src/lib.rs"
+#crate-type = ["cdylib"]
+
+[[bin]]
+name = "test"
+path = "src/test_bin.rs"
+
+[features]
+harness = ["libloading"]
+
+[dependencies]
+libc = "0.2"
+lazy_static = "1.4"
+rustler_sys = { path = "../rustler_sys" }
+
+libloading = { version ="0.6", optional = true }
+
+[profile.dev]
+panic = "abort"
+
+[profile.release]
+panic = "abort"
+
+[profile.test]
+panic = "abort"

@@ -23,6 +23,12 @@
 //! For more information about this, see [the documentation for
 //! rustler](https://hexdocs.pm/rustler).
 
+#[cfg(not(feature = "mock"))]
+use rustler_sys;
+
+#[cfg(feature = "mock")]
+use rustler_mock_rt as rustler_sys;
+
 #[doc(hidden)]
 pub mod wrapper;
 

@@ -56,7 +56,7 @@ impl<'a> Term<'a> {
             unsafe {
                 Term::new(
                     env,
-                    rustler_sys::enif_make_copy(env.as_c_arg(), self.as_c_arg()),
+                    crate::wrapper::enif_make_copy(env.as_c_arg(), self.as_c_arg()),
                 )
             }
         }
@@ -125,13 +125,13 @@ impl<'a> Term<'a> {
 
 impl<'a> PartialEq for Term<'a> {
     fn eq(&self, other: &Term) -> bool {
-        unsafe { rustler_sys::enif_is_identical(self.as_c_arg(), other.as_c_arg()) == 1 }
+        unsafe { crate::wrapper::enif_is_identical(self.as_c_arg(), other.as_c_arg()) == 1 }
     }
 }
 impl<'a> Eq for Term<'a> {}
 
 fn cmp(lhs: &Term, rhs: &Term) -> Ordering {
-    let ord = unsafe { rustler_sys::enif_compare(lhs.as_c_arg(), rhs.as_c_arg()) };
+    let ord = unsafe { crate::wrapper::enif_compare(lhs.as_c_arg(), rhs.as_c_arg()) };
     match ord {
         0 => Ordering::Equal,
         n if n < 0 => Ordering::Less,

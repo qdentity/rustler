@@ -223,7 +223,7 @@ where
     /// at an unpredictable time: whenever the VM decides to do garbage
     /// collection.
     fn drop(&mut self) {
-        unsafe { rustler_sys::enif_release_resource(self.as_c_arg()) };
+        unsafe { crate::wrapper::enif_release_resource(self.as_c_arg()) };
     }
 }
 
