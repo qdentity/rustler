@@ -1,3 +1,5 @@
+use heck::ToSnakeCase;
+
 use proc_macro2::{Span, TokenStream};
 use quote::{quote, quote_spanned};
 
@@ -28,14 +30,14 @@ pub fn transcoder_decorator(ast: &syn::DeriveInput) -> TokenStream {
     for variant in variants {
         let name = Context::name_from_attrs_or_ident(&variant.ident, &variant.attrs);
         let atom = Context::string_to_atom_fun(&name);
-        atom_lookup.insert(AtomKey::Variant(&variant.ident), (name, atom));
+        atom_lookup.insert(AtomKey::Variant(&variant.ident), (name.to_snake_case(), atom));
 
         if let Fields::Named(fields) = &variant.fields {
             for field in &fields.named {
                 let field_ident = field.ident.as_ref().expect("Named fields must have an ident.");
                 let name = Context::name_from_attrs_or_ident(&field_ident, &field.attrs);
                 let atom = Context::string_to_atom_fun(&name);
-                atom_lookup.insert(AtomKey::Field(&variant.ident, field_ident), (name, atom));
+                atom_lookup.insert(AtomKey::Field(&variant.ident, field_ident), (name.to_snake_case(), atom));
             }
         }
     }

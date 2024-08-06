@@ -62,6 +62,24 @@ pub struct AddStruct {
     loc: (u32, u32),
 }
 
+#[rustler::nif]
+pub fn struct_echo(add_struct: AddStruct) -> AddStruct {
+    add_struct
+}
+
+#[derive(Debug, NifStruct)]
+#[module = "AddStruct"]
+pub struct RenamedAddStruct {
+    #[rustler(rename = "lhs")] left_hand_side: i32,
+    #[rustler(rename = "rhs")] right_hande_side: i32,
+    loc: (u32, u32)
+}
+
+#[rustler::nif]
+pub fn renamed_struct_echo(renamed_struct: RenamedAddStruct) -> RenamedAddStruct {
+    renamed_struct
+}
+
 #[derive(Debug, NifException)]
 #[module = "AddException"]
 pub struct AddException {
@@ -70,13 +88,20 @@ pub struct AddException {
 }
 
 #[rustler::nif]
-pub fn struct_echo(add_struct: AddStruct) -> AddStruct {
-    add_struct
+pub fn exception_echo(add_exception: AddException) -> AddException {
+    add_exception
+}
+
+#[derive(Debug, NifException)]
+#[module = "AddException"]
+pub struct RenamedAddException {
+    #[rustler(rename = "message")] m: String,
+    #[rustler(rename = "loc")] l: (u32, u32)
 }
 
 #[rustler::nif]
-pub fn exception_echo(add_exception: AddException) -> AddException {
-    add_exception
+pub fn renamed_exception_echo(renamed: RenamedAddException) -> RenamedAddException {
+    renamed
 }
 
 #[derive(NifUnitEnum)]
@@ -88,6 +113,17 @@ pub enum UnitEnum {
 #[rustler::nif]
 pub fn unit_enum_echo(unit_enum: UnitEnum) -> UnitEnum {
     unit_enum
+}
+
+#[derive(NifUnitEnum)]
+pub enum RenamedUnitEnum {
+    #[rustler(rename="baz_bar")] FooBar,
+    #[rustler(rename="foo")] Baz
+}
+
+#[rustler::nif]
+pub fn renamed_unit_enum_echo(renamed: RenamedUnitEnum) -> RenamedUnitEnum {
+    renamed
 }
 
 #[derive(NifTaggedEnum)]

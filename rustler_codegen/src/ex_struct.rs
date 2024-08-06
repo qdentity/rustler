@@ -41,7 +41,7 @@ pub fn transcoder_decorator(ast: &syn::DeriveInput, add_exception: bool) -> Toke
     let atoms_module_name = ctx.atoms_module_name(Span::call_site());
 
     let decoder = if ctx.decode() {
-        gen_decoder(&ctx, struct_fields, &atoms_module_name)
+        gen_decoder(&ctx, elixir_module.as_str(), struct_fields, &atoms_module_name)
     } else {
         quote! {}
     };
@@ -66,9 +66,8 @@ pub fn transcoder_decorator(ast: &syn::DeriveInput, add_exception: bool) -> Toke
     gen
 }
 
-fn gen_decoder(ctx: &Context, fields: &[&Field], atoms_module_name: &Ident) -> TokenStream {
+fn gen_decoder(ctx: &Context, module_name: &str, fields: &[&Field], atoms_module_name: &Ident) -> TokenStream {
     let struct_name = ctx.ident;
-    let struct_name_str = struct_name.to_string();
 
     let idents: Vec<_> = fields
         .iter()
@@ -112,7 +111,7 @@ fn gen_decoder(ctx: &Context, fields: &[&Field], atoms_module_name: &Ident) -> T
                     match ::rustler::Decoder::decode(term.map_get(&field)?) {
                         Err(_) => Err(::rustler::Error::RaiseTerm(Box::new(format!(
                                         "Could not decode field :{:?} on %{}{{}}",
-                                        field, #struct_name_str
+                                        field, #module_name
                         )))),
                         Ok(value) => Ok(value),
                     }

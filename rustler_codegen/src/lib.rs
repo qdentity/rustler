@@ -352,6 +352,21 @@ pub fn nif_unit_enum(input: TokenStream) -> TokenStream {
 ///   assert {:baz, %{a: 33, b: 21}} == RustlerTest.tagged_enum_echo({:baz, %{a: 33, b: 21}})
 /// end
 /// ```
+///
+/// The user may change the identifiers of variants and named fields with the
+/// `#[rustler(rename = "new_name")]` attribute. For example:
+///
+/// ```ignore
+/// #[derive(NifTaggedEnum)]
+/// enum TaggedEnum {
+///    #[rustler(rename = "kirk")] Foo,
+///    #[rustler(rename = "picard")] Bar(String),
+///    #[rustler(rename = "janeway")] Baz{
+///      a: i32,
+///      #[rustler(rename = "c")] b: i32
+///    }
+/// }
+/// ```
 #[proc_macro_derive(NifTaggedEnum, attributes(rustler))]
 pub fn nif_tagged_enum(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
