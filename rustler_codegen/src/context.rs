@@ -127,11 +127,11 @@ impl<'a> Context<'a> {
 
     pub fn field_to_atom_fun(field: &Field) -> Ident {
         let ident = field.ident.as_ref().unwrap();
-        Self::ident_to_atom_fun(ident)
+        Self::string_to_atom_fun(&ident.to_string())
     }
 
-    pub fn ident_to_atom_fun(ident: &Ident) -> Ident {
-        let ident_str = ident.to_string().to_snake_case();
+    pub fn string_to_atom_fun(str: &str) -> Ident {
+        let ident_str = str.to_snake_case();
         let ident_str = Self::remove_raw(&ident_str);
 
         Ident::new(&format!("atom_{}", ident_str), Span::call_site())
