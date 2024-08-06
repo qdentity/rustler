@@ -65,11 +65,16 @@ defmodule RustlerTest.CodegenTest do
                end)
     end
 
+    test "with renamed fields" do
+      value = %AddStruct{lhs: 45, rhs: 12, loc: {66, 15}}
+      assert value == RustlerTest.renamed_struct_echo(value)
+    end
+
     test "with invalid struct" do
       value = %AddStruct{lhs: "lhs", rhs: 123, loc: {76, 15}}
 
       assert_raise ErlangError,
-                   "Erlang error: \"Could not decode field :lhs on %AddStruct{}\"",
+                   "Erlang error: \"Could not decode field :lhs on %Elixir.AddStruct{}\"",
                    fn ->
                      RustlerTest.struct_echo(value)
                    end
@@ -77,9 +82,27 @@ defmodule RustlerTest.CodegenTest do
       value = %AddStruct{lhs: 45, rhs: 123, loc: {-76, -15}}
 
       assert_raise ErlangError,
-                   "Erlang error: \"Could not decode field :loc on %AddStruct{}\"",
+                   "Erlang error: \"Could not decode field :loc on %Elixir.AddStruct{}\"",
                    fn ->
                      RustlerTest.struct_echo(value)
+                   end
+    end
+
+    test "with invalid struct with renamed fields" do
+      value = %AddStruct{lhs: "lhs", rhs: 123, loc: {76, 15}}
+
+      assert_raise ErlangError,
+                   "Erlang error: \"Could not decode field :lhs on %Elixir.AddStruct{}\"",
+                   fn ->
+                     RustlerTest.renamed_struct_echo(value)
+                   end
+
+      value = %AddStruct{lhs: 45, rhs: 123, loc: {-76, -15}}
+
+      assert_raise ErlangError,
+                   "Erlang error: \"Could not decode field :loc on %Elixir.AddStruct{}\"",
+                   fn ->
+                     RustlerTest.renamed_struct_echo(value)
                    end
     end
   end
@@ -95,11 +118,16 @@ defmodule RustlerTest.CodegenTest do
                end)
     end
 
+    test "with renamed fields" do
+      value = %AddException{message: "testing", loc: {96, 15}}
+      assert value == RustlerTest.renamed_exception_echo(value)
+    end
+    
     test "with invalid struct" do
       value = %AddException{message: ~c"this is a charlist", loc: {106, 15}}
 
       assert_raise ErlangError,
-                   "Erlang error: \"Could not decode field :message on %AddException{}\"",
+                   "Erlang error: \"Could not decode field :message on %Elixir.AddException{}\"",
                    fn ->
                      RustlerTest.exception_echo(value)
                    end
@@ -107,7 +135,7 @@ defmodule RustlerTest.CodegenTest do
       value = %AddException{message: "testing", loc: %{line: 114, col: 15}}
 
       assert_raise ErlangError,
-                   "Erlang error: \"Could not decode field :loc on %AddException{}\"",
+                   "Erlang error: \"Could not decode field :loc on %Elixir.AddException{}\"",
                    fn ->
                      RustlerTest.exception_echo(value)
                    end
@@ -150,6 +178,11 @@ defmodule RustlerTest.CodegenTest do
 
     assert %ErlangError{original: :invalid_variant} ==
              assert_raise(ErlangError, fn -> RustlerTest.unit_enum_echo(:somethingelse) end)
+  end
+
+  test "renamed unit enum transcoder" do
+    assert :baz_bar == RustlerTest.renamed_unit_enum_echo(:baz_bar)
+    assert :foo == RustlerTest.renamed_unit_enum_echo(:foo)
   end
 
   test "tagged enum transcoder 1" do
