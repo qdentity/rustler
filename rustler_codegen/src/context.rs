@@ -1,7 +1,7 @@
 use heck::ToSnakeCase;
 use proc_macro2::{Span, TokenStream};
 use quote::quote;
-use syn::{Data, Field, Fields, Ident, Lifetime, Lit, Meta, TypeParam, Variant};
+use syn::{Attribute, Data, Field, Fields, Ident, Lifetime, Lit, Meta, TypeParam, Variant};
 
 use super::RustlerAttr;
 
@@ -108,11 +108,13 @@ impl<'a> Context<'a> {
         self.struct_fields.as_ref().map(|struct_fields| {
             struct_fields
                 .iter()
-                .map(|field| {
+                .map(|field| {                    
                     let atom_fun = Self::field_to_atom_fun(field);
-
-                    let ident = field.ident.as_ref().unwrap();
-                    let ident_str = ident.to_string();
+                    let ident_str = Self::maybe_parse_rename(&field.attrs)
+                        .unwrap_or_else(|| {
+                            let ident = field.ident.as_ref().unwrap();
+                            ident.to_string()
+                        });
                     let ident_str = Self::remove_raw(&ident_str);
 
                     quote! {
@@ -230,5 +232,57 @@ impl<'a> Context<'a> {
             }
         }
         panic!("Cannot parse module")
+    }
+
+    pub(crate) fn name_from_attrs_or_ident(ident: &Ident, attrs: &[Attribute]) -> String {
+        if let Some(name) = Self::maybe_parse_rename(attrs) {
+            return name;
+        }
+
+        return ident.to_string();
+    }
+
+    fn maybe_parse_rename(attrs: &[Attribute]) -> Option<String> {
+        fn parse_rename(attr: &Attribute) -> Result<String, ()> {
+            let expr: syn::Expr = attr.parse_args().map_err(|_| ())?;
+            let expr = match expr {
+                syn::Expr::Assign(expr) => expr,
+                _ => return Err(())
+            };
+
+            // check if left hand side is 'rename'
+            let mut found_rename_ident = false;
+            if let syn::Expr::Path(key) = &*expr.left {
+                found_rename_ident = key.path.is_ident("rename");
+            }
+
+            if !found_rename_ident {
+                return Err(())
+            }
+
+            // check if right hand side is the new field name
+            let mut rename_value = None;
+
+            if let syn::Expr::Lit(lit) = &*expr.right {
+                if let syn::Lit::Str(str) = &lit.lit {
+                    rename_value = Some(str.value());
+                }
+            }
+
+            return rename_value.ok_or(());
+        }
+
+        for attr in attrs {
+            if !attr.path().is_ident("rustler") {
+                // ignore
+                continue
+            }
+
+            // We now expect to support whatever is inside the args
+            let name = parse_rename(&attr).expect("expected 'rustler(rename = \"field_name\")'");
+            return Some(name)
+        }
+
+        return None;
     }
 }
